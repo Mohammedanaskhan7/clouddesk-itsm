@@ -37,10 +37,10 @@
 ## 📸 Screenshots
 
 ### Employee Dashboard & Ticket Inspector
-[Employee Dashboard][screenshots/README.md/dashboard.png]
+![Employee Dashboard][screenshots/README.md/dashboard.png]
 
 ### Built-in 12-Scenario Verification Runner
-[Verification Runner][screenshots/README.md/test_runner.png]
+![Verification Runner][screenshots/README.md/test_runner.png]
 
 ---
 
