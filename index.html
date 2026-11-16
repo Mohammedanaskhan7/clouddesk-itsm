@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cloud-Based IT Help Desk Ticket Management System | Osmania University MCA Mini Project</title>
+  <title>CloudDesk ITSM — IT Help Desk & Ticket Management System</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -53,15 +53,15 @@
   <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-800">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
       <div class="flex items-center gap-2">
-        <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-semibold">MCA III SEM MINI PROJECT</span>
-        <span class="font-medium text-white">PGRRCDE, Osmania University, Hyderabad</span>
+        <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-semibold">CLOUDDESK ITSM v1.0</span>
+        <span class="font-medium text-white">Enterprise IT Service Desk Portal</span>
         <span class="hidden md:inline text-slate-400">|</span>
-        <span class="hidden md:inline text-slate-300">Candidate: Mohammed Anas Ullah Khan (094255510015)</span>
+        <span class="hidden md:inline text-slate-300">Role-Based Ticket Lifecycle &amp; RBAC Demo</span>
       </div>
       <div class="flex items-center gap-3">
         <span class="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
           <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-          Firebase Auth &amp; Cloud Firestore Active (Spark Free Plan)
+          Prototype Mode • Browser LocalStorage Active
         </span>
       </div>
     </div>
@@ -75,8 +75,8 @@
           IT
         </div>
         <div>
-          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Cloud IT Help Desk System</h1>
-          <p class="text-xs text-slate-500">Google AI Studio &amp; Firebase Cloud Architecture</p>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">CloudDesk ITSM</h1>
+          <p class="text-xs text-slate-500">IT Help Desk &amp; Ticket Management Platform</p>
         </div>
       </div>
 
@@ -128,15 +128,15 @@
       <!-- Quick Role Switcher Bar for Viva / Examiner Demonstration -->
       <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-700">
-          <span class="font-semibold text-slate-900">Quick Examiner Demo Switcher:</span>
-          <span>Test the application as different authenticated Firebase users:</span>
+          <span class="font-semibold text-slate-900">Interactive Role Switcher:</span>
+          <span>Preview the workspace across different user roles:</span>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <button type="button" onclick="quickSignIn('emp1')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100">
-            Employee 1: Anas Khan (MCA Lab)
+            Employee 1: Anas Khan (Engineering)
           </button>
           <button type="button" onclick="quickSignIn('emp2')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100">
-            Employee 2: Priya Sharma (Accounts)
+            Employee 2: Priya Sharma (Finance)
           </button>
           <button type="button" onclick="quickSignIn('admin')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-800 border border-indigo-200 hover:bg-indigo-100">
             IT Support Admin: Rajesh Verma
@@ -705,7 +705,7 @@ service cloud.firestore {
         ticketId: "TKT-2026-1001",
         subject: "Lab Workstation #12 not booting into Ubuntu Linux",
         category: "Hardware Problems",
-        description: "Workstation #12 in the MCA III Semester Programming Lab shows a disk read error after BIOS post. Needed urgently for practical lab session.",
+        description: "Workstation #12 in Engineering Lab B shows a disk read error after BIOS post. Needed urgently for daily operations.",
         priority: "High",
         status: "In Progress",
         createdBy: "usr_emp_anas01",
@@ -735,7 +735,7 @@ service cloud.firestore {
         ticketId: "TKT-2026-1003",
         subject: "Intermittent Wi-Fi disconnection in Study Centre Reading Room",
         category: "Network Problems",
-        description: "The PGRRCDE student Wi-Fi access point drops connection every 15 minutes during online cloud computing lectures.",
+        description: "The office Wi-Fi access point drops connection every 15 minutes during video calls.",
         priority: "Medium",
         status: "Open",
         createdBy: "usr_emp_anas01",
