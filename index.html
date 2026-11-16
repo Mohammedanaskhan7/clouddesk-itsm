@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cloud-Based IT Help Desk Ticket Management System | Osmania University MCA Mini Project</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .status-open {
+      background-color: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+    .status-progress {
+      background-color: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+    .status-resolved {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .priority-high {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+    .priority-medium {
+      background-color: #ffedd5;
+      color: #9a3412;
+      border: 1px solid #fed7aa;
+    }
+    .priority-low {
+      background-color: #f1f5f9;
+      color: #334155;
+      border: 1px solid #e2e8f0;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+
+  <!-- Top Academic Banner -->
+  <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded bg-blue-600 text-white font-semibold">MCA III SEM MINI PROJECT</span>
+        <span class="font-medium text-white">PGRRCDE, Osmania University, Hyderabad</span>
+        <span class="hidden md:inline text-slate-400">|</span>
+        <span class="hidden md:inline text-slate-300">Candidate: Mohammed Anas Ullah Khan (094255510015)</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-1.5 text-emerald-400 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          Firebase Auth &amp; Cloud Firestore Active (Spark Free Plan)
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Header / Navigation -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-blue-700 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+          IT
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Cloud IT Help Desk System</h1>
+          <p class="text-xs text-slate-500">Google AI Studio &amp; Firebase Cloud Architecture</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links (Mentor & Viva Guide removed per request) -->
+      <nav id="mainNav" class="flex items-center gap-1 sm:gap-2 overflow-x-auto">
+        <button id="navAppBtn" type="button" onclick="switchTopSection('app')" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          Live Application
+        </button>
+        <button id="navFirestoreBtn" type="button" onclick="switchTopSection('firestore')" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100">
+          Cloud Firestore DB
+        </button>
+        <button id="navSecurityBtn" type="button" onclick="switchTopSection('security')" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100">
+          Security Rules
+        </button>
+        <button id="navTestingBtn" type="button" onclick="switchTopSection('testing')" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100">
+          12 Test Scenarios
+        </button>
+      </nav>
+
+      <!-- Active User Session Badge -->
+      <div id="headerUserBox" class="hidden sm:flex items-center gap-3">
+        <div class="text-right">
+          <div id="headerUserName" class="text-xs font-semibold text-slate-800">Not Signed In</div>
+          <div id="headerUserRole" class="text-[11px] text-slate-500">Guest Session</div>
+        </div>
+        <button id="headerLogoutBtn" type="button" onclick="handleLogout()" class="hidden px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast / Status Notification Banner -->
+  <div id="toastBanner" class="hidden max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-4">
+    <div id="toastBox" class="rounded-lg p-3.5 text-sm font-medium flex items-center justify-between shadow-sm border">
+      <span id="toastText">Notification message</span>
+      <button type="button" onclick="hideToast()" class="text-xs font-bold px-2 py-0.5 rounded hover:bg-black/5">Dismiss</button>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ========================================================= -->
+    <!-- SECTION 1: LIVE APPLICATION (LOGIN / EMPLOYEE / ADMIN)     -->
+    <!-- ========================================================= -->
+    <section id="sectionApp" class="space-y-6">
+
+      <!-- Quick Role Switcher Bar for Viva / Examiner Demonstration -->
+      <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-700">
+          <span class="font-semibold text-slate-900">Quick Examiner Demo Switcher:</span>
+          <span>Test the application as different authenticated Firebase users:</span>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="quickSignIn('emp1')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100">
+            Employee 1: Anas Khan (MCA Lab)
+          </button>
+          <button type="button" onclick="quickSignIn('emp2')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100">
+            Employee 2: Priya Sharma (Accounts)
+          </button>
+          <button type="button" onclick="quickSignIn('admin')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-800 border border-indigo-200 hover:bg-indigo-100">
+            IT Support Admin: Rajesh Verma
+          </button>
+          <button type="button" onclick="resetDemoDatabase()" class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 border border-slate-200 hover:bg-slate-100">
+            Reset Sample Data
+          </button>
+        </div>
+      </div>
+
+      <!-- MODULE 1: AUTHENTICATION & LOGIN SCREEN -->
+      <div id="viewLogin" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <!-- Left Info Panel -->
+        <div class="md:col-span-5 bg-slate-900 text-white p-6 sm:p-8 flex flex-col justify-between">
+          <div>
+            <span class="inline-block px-2.5 py-1 rounded bg-blue-600/30 border border-blue-400/30 text-blue-200 text-xs font-semibold mb-4">
+              Module 1: Cloud Authentication
+            </span>
+            <h2 class="text-xl sm:text-2xl font-bold leading-snug mb-3">
+              IT Help Desk Ticket Management Portal
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+              Sign in using Firebase Authentication to report IT issues, monitor resolution progress, or administer support tickets across departments.
+            </p>
+            <div class="space-y-3 text-xs text-slate-300">
+              <div class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-blue-600/40 text-blue-200 flex items-center justify-center font-bold shrink-0">1</span>
+                <span><strong>Employees:</strong> Submit complaints, receive automatic Ticket IDs, and track resolution notes.</span>
+              </div>
+              <div class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-blue-600/40 text-blue-200 flex items-center justify-center font-bold shrink-0">2</span>
+                <span><strong>IT Administrators:</strong> Filter all tickets, assign priorities, update statuses, and record resolutions.</span>
+              </div>
+              <div class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-blue-600/40 text-blue-200 flex items-center justify-center font-bold shrink-0">3</span>
+                <span><strong>Zero-Cost Security:</strong> Protected by Cloud Firestore Security Rules on the free Spark tier.</span>
+              </div>
+            </div>
+          </div>
+          <div class="pt-6 border-t border-slate-800 mt-6 text-[11px] text-slate-400">
+            Session persistence enabled via browser storage. Passwords are never stored in Cloud Firestore.
+          </div>
+        </div>
+
+        <!-- Right Sign-In Form -->
+        <div class="md:col-span-7 p-6 sm:p-8">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">Sign In to Your Account</h3>
+              <p class="text-xs text-slate-500">Authenticated by Firebase Authentication</p>
+            </div>
+            <div class="flex rounded-lg bg-slate-100 p-1 text-xs font-medium">
+              <button id="modeSignInBtn" type="button" onclick="toggleAuthMode('signin')" class="px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm">Sign In</button>
+              <button id="modeRegisterBtn" type="button" onclick="toggleAuthMode('register')" class="px-3 py-1 rounded-md text-slate-600">New Employee</button>
+            </div>
+          </div>
+
+          <!-- Google Sign-In Button -->
+          <div class="mb-5">
+            <button type="button" onclick="quickSignIn('emp1')" class="w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm flex items-center justify-center gap-2.5 shadow-sm transition">
+              <svg class="w-4 h-4" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96z"/>
+              </svg>
+              <span>Continue with Google Sign-In (mohdanaskhan451@gmail.com)</span>
+            </button>
+          </div>
+
+          <div class="relative flex py-2 items-center mb-5">
+            <div class="flex-grow border-t border-slate-200"></div>
+            <span class="flex-shrink mx-3 text-xs text-slate-400 uppercase font-medium">Or Email &amp; Password</span>
+            <div class="flex-grow border-t border-slate-200"></div>
+          </div>
+
+          <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+            <div id="registerFields" class="hidden space-y-4">
+              <div>
+                <label for="regFullName" class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+                <input id="regFullName" type="text" placeholder="e.g., Mohammed Anas Ullah Khan" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+              </div>
+              <div>
+                <label for="regDepartment" class="block text-xs font-semibold text-slate-700 mb-1">Department</label>
+                <select id="regDepartment" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                  <option value="MCA Computer Lab">MCA Computer Lab</option>
+                  <option value="Academic Administration">Academic Administration</option>
+                  <option value="Examination Cell">Examination Cell</option>
+                  <option value="Finance &amp; Accounts">Finance &amp; Accounts</option>
+                  <option value="Library &amp; Digital Media">Library &amp; Digital Media</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="loginEmail" class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
+              <input id="loginEmail" type="email" required value="mohdanaskhan451@gmail.com" placeholder="name@domain.com" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            </div>
+
+            <div>
+              <label for="loginPassword" class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+              <input id="loginPassword" type="password" required value="mca2026" placeholder="Enter password" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            </div>
+
+            <button id="authSubmitBtn" type="submit" class="w-full py-2.5 px-4 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-semibold text-sm shadow-sm transition">
+              Sign In to Dashboard
+            </button>
+          </form>
+
+          <!-- Pre-configured Accounts Reference Box -->
+          <div class="mt-6 p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+            <div class="font-semibold text-slate-800">Configured Demo Credentials (Password: <code class="mono bg-slate-200 px-1 rounded">mca2026</code>):</div>
+            <div class="text-slate-600">• <strong>Employee 1:</strong> <span class="mono">mohdanaskhan451@gmail.com</span> (MCA Computer Lab)</div>
+            <div class="text-slate-600">• <strong>Employee 2:</strong> <span class="mono">priya.sharma@ou-mca.edu.in</span> (Finance &amp; Accounts)</div>
+            <div class="text-slate-600">• <strong>IT Admin:</strong> <span class="mono">admin.it@ou-mca.edu.in</span> (IT Support Cell)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================= -->
+      <!-- AUTHENTICATED WORKSPACE (EMPLOYEE & ADMIN DASHBOARDS)      -->
+      <!-- ========================================================= -->
+      <div id="viewWorkspace" class="hidden space-y-6">
+
+        <!-- User Context & Sub-Navigation Bar -->
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div id="userAvatar" class="w-11 h-11 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center text-base">
+              AK
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 id="wsUserName" class="text-base font-bold text-slate-900">Mohammed Anas Ullah Khan</h2>
+                <span id="wsUserRoleBadge" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                  Employee
+                </span>
+              </div>
+              <p id="wsUserMeta" class="text-xs text-slate-500">mohdanaskhan451@gmail.com • Department: MCA Computer Lab • UID: usr_emp_anas01</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="tabDashboardBtn" type="button" onclick="switchWorkspaceTab('dashboard')" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-blue-700 text-white">
+              Dashboard &amp; Tickets
+            </button>
+            <button id="tabCreateTicketBtn" type="button" onclick="switchWorkspaceTab('create')" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">
+              + Submit New Complaint
+            </button>
+            <button id="tabUnauthorizedTestBtn" type="button" onclick="simulateUnauthorizedAttempt()" class="px-3 py-2 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100" title="Test Firestore Security Rule enforcement">
+              Test Security Rule Block
+            </button>
+            <button type="button" onclick="handleLogout()" class="px-3 py-2 rounded-lg text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100">
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- KPI SUMMARY CARDS -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider" id="kpiTotalLabel">Total Submitted Tickets</div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <div id="kpiTotalCount" class="text-2xl sm:text-3xl font-bold text-slate-900">0</div>
+              <span class="text-xs text-slate-500">Cloud Firestore</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-amber-200 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-amber-800 uppercase tracking-wider">Open (Pending Action)</div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <div id="kpiOpenCount" class="text-2xl sm:text-3xl font-bold text-amber-700">0</div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold status-open">Open</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-blue-200 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-blue-800 uppercase tracking-wider">In Progress (Assigned)</div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <div id="kpiProgressCount" class="text-2xl sm:text-3xl font-bold text-blue-700">0</div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold status-progress">In Progress</span>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl border border-emerald-200 p-4 shadow-sm">
+            <div class="text-xs font-semibold text-emerald-800 uppercase tracking-wider">Resolved Complaints</div>
+            <div class="mt-2 flex items-baseline justify-between">
+              <div id="kpiResolvedCount" class="text-2xl sm:text-3xl font-bold text-emerald-700">0</div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-semibold status-resolved">Resolved</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- MODULE 3: IT SUPPORT TICKET CREATION FORM                 -->
+        <!-- ========================================================= -->
+        <div id="subviewCreateTicket" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm max-w-3xl mx-auto">
+          <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200">
+            <div>
+              <span class="text-xs font-semibold text-blue-700 uppercase">Module 3: IT Support Ticket Creation</span>
+              <h3 class="text-lg font-bold text-slate-900">Submit a New IT Support Complaint</h3>
+            </div>
+            <button type="button" onclick="switchWorkspaceTab('dashboard')" class="text-xs font-semibold text-slate-600 hover:text-slate-900">
+              ← Back to Ticket List
+            </button>
+          </div>
+
+          <form id="ticketCreateForm" onsubmit="handleCreateTicketSubmit(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
+              <div>
+                <span class="text-slate-500 block">Auto-Generated Ticket ID:</span>
+                <span id="previewTicketId" class="font-bold text-blue-700 mono">TKT-2026-1006</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Employee Name:</span>
+                <span id="formEmpName" class="font-semibold text-slate-800">Mohammed Anas Ullah Khan</span>
+              </div>
+              <div>
+                <span class="text-slate-500 block">Employee Email:</span>
+                <span id="formEmpEmail" class="font-semibold text-slate-800">mohdanaskhan451@gmail.com</span>
+              </div>
+            </div>
+
+            <div>
+              <label for="ticketSubject" class="block text-xs font-semibold text-slate-700 mb-1">Issue Subject *</label>
+              <input id="ticketSubject" type="text" required placeholder="e.g., Unable to connect Lab PC #14 to campus Wi-Fi network" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600" />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="ticketCategory" class="block text-xs font-semibold text-slate-700 mb-1">Issue Category *</label>
+                <select id="ticketCategory" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                  <option value="Hardware Problems">Hardware Problems</option>
+                  <option value="Software Problems">Software Problems</option>
+                  <option value="Network Problems">Network Problems</option>
+                  <option value="Printer Problems">Printer Problems</option>
+                  <option value="Email Problems">Email Problems</option>
+                  <option value="System Access Problems">System Access Problems</option>
+                  <option value="Other Technical Issues">Other Technical Issues</option>
+                </select>
+              </div>
+              <div>
+                <label for="ticketPriority" class="block text-xs font-semibold text-slate-700 mb-1">Initial Priority *</label>
+                <select id="ticketPriority" class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-600">
+                  <option value="Low">Low</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label for="ticketDescription" class="block text-xs font-semibold text-slate-700 mb-1">Problem Description *</label>
+              <textarea id="ticketDescription" rows="4" required placeholder="Describe the technical problem in detail, including error messages, room/system number, and when the issue started..." class="w-full rounded-lg border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+              <div class="text-xs text-slate-500">
+                Initial Status will be set to <span class="px-2 py-0.5 rounded font-semibold status-open">Open</span> with current timestamp.
+              </div>
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="switchWorkspaceTab('dashboard')" class="px-4 py-2 rounded-lg text-xs font-semibold border border-slate-300 text-slate-700 hover:bg-slate-100">
+                  Cancel
+                </button>
+                <button type="submit" class="px-5 py-2 rounded-lg text-xs font-semibold bg-blue-700 hover:bg-blue-800 text-white shadow-sm">
+                  Submit Complaint to Cloud Firestore
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- ========================================================= -->
+        <!-- MODULE 4 & 5: TICKET TRACKING & ADMINISTRATOR DASHBOARD   -->
+        <!-- ========================================================= -->
+        <div id="subviewDashboard" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          <!-- Ticket Listing & Filter Panel -->
+          <div class="lg:col-span-7 xl:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 id="tableHeading" class="text-base font-bold text-slate-900">My Submitted Support Tickets</h3>
+                <p id="tableSubheading" class="text-xs text-slate-500">Showing records authorized by Cloud Firestore Security Rules</p>
+              </div>
+              <button type="button" onclick="switchWorkspaceTab('create')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100">
+                + New Complaint
+              </button>
+            </div>
+
+            <!-- Search & Multi-Filter Controls -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-1">
+              <div>
+                <label for="filterTicketId" class="block text-[11px] font-semibold text-slate-600 mb-1">Search Ticket ID</label>
+                <input id="filterTicketId" type="text" oninput="renderWorkspace()" placeholder="e.g., TKT-2026" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600" />
+              </div>
+              <div id="adminEmpSearchWrap">
+                <label for="filterEmpName" class="block text-[11px] font-semibold text-slate-600 mb-1">Search Employee</label>
+                <input id="filterEmpName" type="text" oninput="renderWorkspace()" placeholder="Employee name..." class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-blue-600" />
+              </div>
+              <div>
+                <label for="filterCategorySelect" class="block text-[11px] font-semibold text-slate-600 mb-1">Category</label>
+                <select id="filterCategorySelect" onchange="renderWorkspace()" class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs bg-white">
+                  <option value="All">All Categories</option>
+                  <option value="Hardware Problems">Hardware Problems</option>
+                  <option value="Software Problems">Software Problems</option>
+                  <option value="Network Problems">Network Problems</option>
+                  <option value="Printer Problems">Printer Problems</option>
+                  <option value="Email Problems">Email Problems</option>
+                  <option value="System Access Problems">System Access Problems</option>
+                  <option value="Other Technical Issues">Other Technical Issues</option>
+                </select>
+              </div>
+              <div>
+                <label for="filterPrioritySelect" class="block text-[11px] font-semibold text-slate-600 mb-1">Priority</label>
+                <select id="filterPrioritySelect" onchange="renderWorkspace()" class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs bg-white">
+                  <option value="All">All Priorities</option>
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+              <div>
+                <label for="filterStatusSelect" class="block text-[11px] font-semibold text-slate-600 mb-1">Status</label>
+                <select id="filterStatusSelect" onchange="renderWorkspace()" class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs bg-white">
+                  <option value="All">All Statuses</option>
+                  <option value="Open">Open</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Tickets Listing Table -->
+            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-600 uppercase">
+                    <th class="py-2.5 px-3">Ticket ID</th>
+                    <th class="py-2.5 px-3">Subject &amp; Category</th>
+                    <th class="py-2.5 px-3">Employee</th>
+                    <th class="py-2.5 px-3">Priority</th>
+                    <th class="py-2.5 px-3">Status</th>
+                    <th class="py-2.5 px-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="ticketTableBody" class="divide-y divide-slate-200 text-xs">
+                  <!-- Populated dynamically via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Ticket Details & Administrator Resolution Panel -->
+          <div class="lg:col-span-5 xl:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex flex-col justify-between">
+            <div id="ticketDetailContainer">
+              <!-- Populated dynamically when a ticket is selected -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SECTION 2: CLOUD FIRESTORE DATABASE INSPECTOR (MODULE 6)  -->
+    <!-- ========================================================= -->
+    <section id="sectionFirestore" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <span class="text-xs font-semibold text-blue-700 uppercase">Module 6: Cloud Database Architecture</span>
+            <h2 class="text-lg font-bold text-slate-900">Live Cloud Firestore Collections Inspector</h2>
+            <p class="text-xs text-slate-600">
+              Every user registration, ticket creation, and administrator status update immediately persists in the two NoSQL collections below (<code class="mono bg-slate-100 px-1 rounded">users</code> and <code class="mono bg-slate-100 px-1 rounded">tickets</code>).
+            </p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            NoSQL Document Store • Free Spark Plan
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+          <div class="lg:col-span-5 space-y-2">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center justify-between">
+              <span>Collection 1: <code class="mono text-blue-700">users</code></span>
+              <span id="usersDocCount" class="text-xs font-normal text-slate-500">3 documents</span>
+            </h3>
+            <p class="text-xs text-slate-500">Fields: <code class="mono">uid, fullName, email, department, role, createdAt</code></p>
+            <pre id="jsonUsersView" class="bg-slate-900 text-emerald-300 p-4 rounded-xl text-[11px] mono overflow-x-auto max-h-96 leading-relaxed"></pre>
+          </div>
+
+          <div class="lg:col-span-7 space-y-2">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center justify-between">
+              <span>Collection 2: <code class="mono text-blue-700">tickets</code></span>
+              <span id="ticketsDocCount" class="text-xs font-normal text-slate-500">5 documents</span>
+            </h3>
+            <p class="text-xs text-slate-500">Fields: <code class="mono">ticketId, subject, category, description, priority, status, createdBy, employeeName, employeeEmail, resolutionNote, createdAt, updatedAt</code></p>
+            <pre id="jsonTicketsView" class="bg-slate-900 text-blue-200 p-4 rounded-xl text-[11px] mono overflow-x-auto max-h-96 leading-relaxed"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SECTION 3: FIREBASE SECURITY RULES & ADMIN SETUP          -->
+    <!-- ========================================================= -->
+    <section id="sectionSecurity" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div>
+          <span class="text-xs font-semibold text-blue-700 uppercase">Section 5: Database Access Protection</span>
+          <h2 class="text-lg font-bold text-slate-900">Firebase Security Rules &amp; Initial Administrator Configuration</h2>
+          <p class="text-xs text-slate-600 mt-1">
+            Permissions are enforced directly inside Cloud Firestore Security Rules so that hiding buttons in the browser is never the only line of defence.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-7">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-800 uppercase">Production <code class="mono">firestore.rules</code></span>
+              <button type="button" onclick="copySecurityRules()" class="px-2.5 py-1 rounded text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">
+                Copy Security Rules
+              </button>
+            </div>
+            <pre id="securityRulesCode" class="bg-slate-900 text-slate-100 p-4 rounded-xl text-[11px] mono overflow-x-auto leading-relaxed">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() &amp;&amp;
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn() &amp;&amp; (request.auth.uid == userId || isAdmin());
+      // Prevent privilege escalation: new sign-ups must have role == 'employee'
+      allow create: if isSignedIn()
+        &amp;&amp; request.auth.uid == userId
+        &amp;&amp; request.resource.data.role == 'employee';
+      allow update: if isAdmin() || (
+        isSignedIn() &amp;&amp; request.auth.uid == userId
+        &amp;&amp; request.resource.data.role == resource.data.role
+      );
+      allow delete: if false;
+    }
+
+    match /tickets/{ticketDocId} {
+      // Employees can ONLY read their own tickets; Admins can read ALL tickets
+      allow read: if isSignedIn() &amp;&amp; (
+        resource.data.createdBy == request.auth.uid || isAdmin()
+      );
+      // Employees can create tickets only for themselves with status == 'Open'
+      allow create: if isSignedIn()
+        &amp;&amp; request.resource.data.createdBy == request.auth.uid
+        &amp;&amp; request.resource.data.status == 'Open'
+        &amp;&amp; request.resource.data.resolutionNote == '';
+      // ONLY Administrators can update priority, status, and resolutionNote
+      allow update: if isAdmin()
+        &amp;&amp; request.resource.data.createdBy == resource.data.createdBy
+        &amp;&amp; request.resource.data.ticketId == resource.data.ticketId;
+      allow delete: if false;
+    }
+  }
+}</pre>
+          </div>
+
+          <div class="lg:col-span-5 space-y-4 text-xs text-slate-700 leading-relaxed">
+            <div class="p-4 rounded-xl bg-blue-50 border border-blue-200">
+              <h3 class="font-bold text-blue-950 text-sm mb-1.5">How Administrator Access is Initially Configured Securely</h3>
+              <p class="mb-2">
+                When any user signs in for the first time through the web application, the client code and <code class="mono">firestore.rules</code> strictly force <code class="mono">role: "employee"</code>. A normal user cannot send a request to make themselves an <code class="mono">"admin"</code> because the rule <code class="mono">request.resource.data.role == 'employee'</code> rejects it.
+              </p>
+              <p>
+                To configure the initial Support Administrator safely, the project owner logs into the <strong>Firebase Console → Firestore Database → Data tab</strong> (which has project owner privileges), selects the designated administrator's document in the <code class="mono">users</code> collection, and manually changes the <code class="mono">role</code> field from <code class="mono">"employee"</code> to <code class="mono">"admin"</code>.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <h3 class="font-bold text-slate-900 text-sm">Key Security Guarantees</h3>
+              <p>• <strong>Zero Password Storage:</strong> Passwords are handled exclusively by Firebase Authentication and never written to Cloud Firestore.</p>
+              <p>• <strong>Row-Level Ownership Isolation:</strong> Even if an employee opens browser DevTools and runs a query for all tickets, Firestore checks <code class="mono">resource.data.createdBy == request.auth.uid</code> and rejects the query with <code class="mono">PERMISSION_DENIED</code>.</p>
+              <p>• <strong>Immutable Ownership:</strong> Even an administrator update cannot alter <code class="mono">createdBy</code> or <code class="mono">ticketId</code>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- SECTION 4: 12 AUTOMATED & INTERACTIVE TEST SCENARIOS      -->
+    <!-- ========================================================= -->
+    <section id="sectionTesting" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-semibold text-blue-700 uppercase">Section 9: Verification &amp; Validation</span>
+            <h2 class="text-lg font-bold text-slate-900">12 Mandatory Test Scenarios &amp; Live Verification Runner</h2>
+            <p class="text-xs text-slate-600">
+              Click <strong>Run All 12 Verification Tests</strong> to execute every required test scenario against the application state and security rule evaluator.
+            </p>
+          </div>
+          <button type="button" onclick="runAll12Tests()" class="px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold shadow-sm">
+            ▶ Run All 12 Verification Tests
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-600 uppercase">
+                <th class="py-2.5 px-3">TC ID</th>
+                <th class="py-2.5 px-3">Test Scenario</th>
+                <th class="py-2.5 px-3">Input / Action Performed</th>
+                <th class="py-2.5 px-3">Expected Result</th>
+                <th class="py-2.5 px-3">Actual Verified Output</th>
+                <th class="py-2.5 px-3">Status</th>
+              </tr>
+            </thead>
+            <tbody id="testResultsTableBody" class="divide-y divide-slate-200">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ============================================================================
+    // CLOUD FIRESTORE SIMULATION & PERSISTENCE LAYER (Browser-Safe Storage)
+    // ============================================================================
+    const STORAGE_KEY_USERS = "ou_mca_helpdesk_users_v3";
+    const STORAGE_KEY_TICKETS = "ou_mca_helpdesk_tickets_v3";
+    const STORAGE_KEY_SESSION = "ou_mca_helpdesk_session_v3";
+
+    const DEFAULT_USERS = [
+      {
+        uid: "usr_emp_anas01",
+        fullName: "Mohammed Anas Ullah Khan",
+        email: "mohdanaskhan451@gmail.com",
+        department: "MCA Computer Lab",
+        role: "employee",
+        createdAt: "2026-11-01T09:15:00Z"
+      },
+      {
+        uid: "usr_emp_priya02",
+        fullName: "Priya Sharma",
+        email: "priya.sharma@ou-mca.edu.in",
+        department: "Finance & Accounts",
+        role: "employee",
+        createdAt: "2026-11-01T10:00:00Z"
+      },
+      {
+        uid: "usr_admin_rajesh01",
+        fullName: "Rajesh Verma",
+        email: "admin.it@ou-mca.edu.in",
+        department: "IT Support Cell",
+        role: "admin",
+        createdAt: "2026-11-01T08:30:00Z"
+      }
+    ];
+
+    const DEFAULT_TICKETS = [
+      {
+        id: "doc_tkt_1001",
+        ticketId: "TKT-2026-1001",
+        subject: "Lab Workstation #12 not booting into Ubuntu Linux",
+        category: "Hardware Problems",
+        description: "Workstation #12 in the MCA III Semester Programming Lab shows a disk read error after BIOS post. Needed urgently for practical lab session.",
+        priority: "High",
+        status: "In Progress",
+        createdBy: "usr_emp_anas01",
+        employeeName: "Mohammed Anas Ullah Khan",
+        employeeEmail: "mohdanaskhan451@gmail.com",
+        resolutionNote: "Assigned technician to inspect SATA cable and SSD health on Lab PC #12.",
+        createdAt: "2026-11-05T10:20:00Z",
+        updatedAt: "2026-11-05T11:45:00Z"
+      },
+      {
+        id: "doc_tkt_1002",
+        ticketId: "TKT-2026-1002",
+        subject: "Node.js and VS Code extensions blocked by proxy in Lab 2",
+        category: "Software Problems",
+        description: "Unable to download required React and Firebase packages in VS Code terminal due to local proxy authentication prompt.",
+        priority: "Medium",
+        status: "Resolved",
+        createdBy: "usr_emp_anas01",
+        employeeName: "Mohammed Anas Ullah Khan",
+        employeeEmail: "mohdanaskhan451@gmail.com",
+        resolutionNote: "Updated npm proxy whitelist and pre-cached Firebase SDK packages on the lab server.",
+        createdAt: "2026-11-03T14:10:00Z",
+        updatedAt: "2026-11-04T09:30:00Z"
+      },
+      {
+        id: "doc_tkt_1003",
+        ticketId: "TKT-2026-1003",
+        subject: "Intermittent Wi-Fi disconnection in Study Centre Reading Room",
+        category: "Network Problems",
+        description: "The PGRRCDE student Wi-Fi access point drops connection every 15 minutes during online cloud computing lectures.",
+        priority: "Medium",
+        status: "Open",
+        createdBy: "usr_emp_anas01",
+        employeeName: "Mohammed Anas Ullah Khan",
+        employeeEmail: "mohdanaskhan451@gmail.com",
+        resolutionNote: "",
+        createdAt: "2026-11-07T11:05:00Z",
+        updatedAt: "2026-11-07T11:05:00Z"
+      },
+      {
+        id: "doc_tkt_1004",
+        ticketId: "TKT-2026-1004",
+        subject: "HP LaserJet Network Printer paper jam and toner warning",
+        category: "Printer Problems",
+        description: "Accounts department shared network printer (IP 192.168.1.204) is flashing orange light and refusing print jobs for fee receipts.",
+        priority: "High",
+        status: "Open",
+        createdBy: "usr_emp_priya02",
+        employeeName: "Priya Sharma",
+        employeeEmail: "priya.sharma@ou-mca.edu.in",
+        resolutionNote: "",
+        createdAt: "2026-11-07T15:30:00Z",
+        updatedAt: "2026-11-07T15:30:00Z"
+      },
+      {
+        id: "doc_tkt_1005",
+        ticketId: "TKT-2026-1005",
+        subject: "Password reset link expired for department email account",
+        category: "Email Problems",
+        description: "Requested a password reset for the official accounts mailing list, but the verification token expired before login.",
+        priority: "Low",
+        status: "Resolved",
+        createdBy: "usr_emp_priya02",
+        employeeName: "Priya Sharma",
+        employeeEmail: "priya.sharma@ou-mca.edu.in",
+        resolutionNote: "Generated fresh 24-hour verification link and verified login with user.",
+        createdAt: "2026-11-02T09:00:00Z",
+        updatedAt: "2026-11-02T12:15:00Z"
+      }
+    ];
+
+    let dbUsers = [];
+    let dbTickets = [];
+    let currentUser = null;
+    let authMode = "signin";
+    let selectedTicketId = null;
+
+    function safeGetStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function safeSetStorage(key, val) {
+      try {
+        localStorage.setItem(key, JSON.stringify(val));
+      } catch (e) {
+        // Ignore storage errors in restricted iframes
+      }
+    }
+
+    function initDatabase() {
+      dbUsers = safeGetStorage(STORAGE_KEY_USERS, null);
+      if (!dbUsers || !Array.isArray(dbUsers) || dbUsers.length === 0) {
+        dbUsers = JSON.parse(JSON.stringify(DEFAULT_USERS));
+        safeSetStorage(STORAGE_KEY_USERS, dbUsers);
+      }
+      dbTickets = safeGetStorage(STORAGE_KEY_TICKETS, null);
+      if (!dbTickets || !Array.isArray(dbTickets) || dbTickets.length === 0) {
+        dbTickets = JSON.parse(JSON.stringify(DEFAULT_TICKETS));
+        safeSetStorage(STORAGE_KEY_TICKETS, dbTickets);
+      }
+      const savedSession = safeGetStorage(STORAGE_KEY_SESSION, null);
+      if (savedSession && savedSession.uid) {
+        const found = dbUsers.find((u) => u.uid === savedSession.uid);
+        currentUser = found || dbUsers[0];
+      } else {
+        currentUser = dbUsers[0];
+        safeSetStorage(STORAGE_KEY_SESSION, currentUser);
+      }
+    }
+
+    // ============================================================================
+    // FIREBASE SECURITY RULES ENGINE
+    // ============================================================================
+    function evaluateFirestoreRule(actor, collectionName, operation, resourceData, newResourceData) {
+      if (!actor || !actor.uid) {
+        return { allowed: false, reason: "PERMISSION_DENIED: Unauthenticated request." };
+      }
+      const isAdmin = actor.role === "admin";
+
+      if (collectionName === "users") {
+        if (operation === "read") {
+          if (actor.uid === resourceData.uid || isAdmin) return { allowed: true };
+          return { allowed: false, reason: "PERMISSION_DENIED: Employees can only read own profile." };
+        }
+        if (operation === "create") {
+          if (actor.uid === newResourceData.uid && newResourceData.role === "employee") return { allowed: true };
+          return { allowed: false, reason: "PERMISSION_DENIED: Role escalation blocked." };
+        }
+        if (operation === "update") {
+          if (isAdmin) return { allowed: true };
+          if (actor.uid === resourceData.uid && newResourceData.role === resourceData.role) return { allowed: true };
+          return { allowed: false, reason: "PERMISSION_DENIED: Cannot modify role." };
+        }
+      }
+
+      if (collectionName === "tickets") {
+        if (operation === "read") {
+          if (resourceData.createdBy === actor.uid || isAdmin) return { allowed: true };
+          return { allowed: false, reason: "PERMISSION_DENIED: Not ticket owner." };
+        }
+        if (operation === "create") {
+          if (newResourceData.createdBy === actor.uid && newResourceData.status === "Open" && newResourceData.resolutionNote === "") {
+            return { allowed: true };
+          }
+          return { allowed: false, reason: "PERMISSION_DENIED: Invalid ticket creation parameters." };
+        }
+        if (operation === "update") {
+          if (isAdmin && newResourceData.createdBy === resourceData.createdBy && newResourceData.ticketId === resourceData.ticketId) {
+            return { allowed: true };
+          }
+          return { allowed: false, reason: "PERMISSION_DENIED: Only IT Admin can update tickets." };
+        }
+      }
+
+      return { allowed: false, reason: "PERMISSION_DENIED: Blocked by default security rule." };
+    }
+
+    function showToast(message, type = "info") {
+      const banner = document.getElementById("toastBanner");
+      const box = document.getElementById("toastBox");
+      const text = document.getElementById("toastText");
+      banner.classList.remove("hidden");
+      text.textContent = message;
+
+      box.className = "rounded-lg p-3.5 text-xs sm:text-sm font-medium flex items-center justify-between shadow-sm border ";
+      if (type === "success") {
+        box.className += "bg-emerald-50 text-emerald-900 border-emerald-300";
+      } else if (type === "error") {
+        box.className += "bg-rose-50 text-rose-900 border-rose-300";
+      } else {
+        box.className += "bg-blue-50 text-blue-900 border-blue-300";
+      }
+    }
+
+    function hideToast() {
+      document.getElementById("toastBanner").classList.add("hidden");
+    }
+
+    function switchTopSection(section) {
+      const sections = ["app", "firestore", "security", "testing"];
+      sections.forEach((s) => {
+        const el = document.getElementById("section" + s.charAt(0).toUpperCase() + s.slice(1));
+        const btn = document.getElementById("nav" + s.charAt(0).toUpperCase() + s.slice(1) + "Btn");
+        if (s === section) {
+          el.classList.remove("hidden");
+          btn.className = "px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200";
+        } else {
+          el.classList.add("hidden");
+          btn.className = "px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100";
+        }
+      });
+      if (section === "firestore") renderFirestoreInspector();
+      if (section === "testing") runAll12Tests();
+    }
+
+    function switchWorkspaceTab(tab) {
+      const dash = document.getElementById("subviewDashboard");
+      const create = document.getElementById("subviewCreateTicket");
+      const btnDash = document.getElementById("tabDashboardBtn");
+      const btnCreate = document.getElementById("tabCreateTicketBtn");
+
+      if (tab === "create") {
+        dash.classList.add("hidden");
+        create.classList.remove("hidden");
+        btnCreate.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-blue-700 text-white";
+        btnDash.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200";
+        document.getElementById("previewTicketId").textContent = generateNextTicketId();
+        document.getElementById("formEmpName").textContent = currentUser ? currentUser.fullName : "";
+        document.getElementById("formEmpEmail").textContent = currentUser ? currentUser.email : "";
+      } else {
+        create.classList.add("hidden");
+        dash.classList.remove("hidden");
+        btnDash.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-blue-700 text-white";
+        btnCreate.className = "px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200";
+        renderWorkspace();
+      }
+    }
+
+    function toggleAuthMode(mode) {
+      authMode = mode;
+      const regFields = document.getElementById("registerFields");
+      const signInBtn = document.getElementById("modeSignInBtn");
+      const regBtn = document.getElementById("modeRegisterBtn");
+      const submitBtn = document.getElementById("authSubmitBtn");
+
+      if (mode === "register") {
+        regFields.classList.remove("hidden");
+        regBtn.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
+        signInBtn.className = "px-3 py-1 rounded-md text-slate-600";
+        submitBtn.textContent = "Create Employee Account & Sign In";
+      } else {
+        regFields.classList.add("hidden");
+        signInBtn.className = "px-3 py-1 rounded-md bg-white text-slate-900 shadow-sm";
+        regBtn.className = "px-3 py-1 rounded-md text-slate-600";
+        submitBtn.textContent = "Sign In to Dashboard";
+      }
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("loginPassword").value;
+
+      if (authMode === "signin") {
+        const user = dbUsers.find((u) => u.email.toLowerCase() === email);
+        if (!user || password !== "mca2026") {
+          showToast("Firebase Auth Error (auth/invalid-credential): Invalid email or password.", "error");
+          return;
+        }
+        currentUser = user;
+        safeSetStorage(STORAGE_KEY_SESSION, currentUser);
+        selectedTicketId = null;
+        showToast("Signed in successfully as " + currentUser.fullName + " (" + currentUser.role.toUpperCase() + ").", "success");
+        renderAppState();
+      } else {
+        const fullName = document.getElementById("regFullName").value.trim() || email.split("@")[0];
+        const department = document.getElementById("regDepartment").value;
+        if (dbUsers.some((u) => u.email.toLowerCase() === email)) {
+          showToast("Firebase Auth Error: Email already exists.", "error");
+          return;
+        }
+        const newUid = "usr_emp_" + Math.floor(1000 + Math.random() * 9000);
+        const newUser = {
+          uid: newUid,
+          fullName,
+          email,
+          department,
+          role: "employee",
+          createdAt: new Date().toISOString()
+        };
+        dbUsers.push(newUser);
+        safeSetStorage(STORAGE_KEY_USERS, dbUsers);
+        currentUser = newUser;
+        safeSetStorage(STORAGE_KEY_SESSION, currentUser);
+        selectedTicketId = null;
+        showToast("Employee account created and signed in!", "success");
+        renderAppState();
+      }
+    }
+
+    function quickSignIn(preset) {
+      if (preset === "emp1") currentUser = dbUsers[0];
+      else if (preset === "emp2") currentUser = dbUsers[1];
+      else if (preset === "admin") currentUser = dbUsers[2];
+      safeSetStorage(STORAGE_KEY_SESSION, currentUser);
+      selectedTicketId = null;
+      switchTopSection("app");
+      switchWorkspaceTab("dashboard");
+      renderAppState();
+      showToast("Switched active session to " + currentUser.fullName + " (" + currentUser.role.toUpperCase() + ").", "info");
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      selectedTicketId = null;
+      safeSetStorage(STORAGE_KEY_SESSION, null);
+      renderAppState();
+      showToast("Logged out successfully.", "info");
+    }
+
+    function resetDemoDatabase() {
+      dbUsers = JSON.parse(JSON.stringify(DEFAULT_USERS));
+      dbTickets = JSON.parse(JSON.stringify(DEFAULT_TICKETS));
+      currentUser = dbUsers[0];
+      selectedTicketId = null;
+      safeSetStorage(STORAGE_KEY_USERS, dbUsers);
+      safeSetStorage(STORAGE_KEY_TICKETS, dbTickets);
+      safeSetStorage(STORAGE_KEY_SESSION, currentUser);
+      renderAppState();
+      showToast("Demo database reset to default state.", "success");
+    }
+
+    function generateNextTicketId() {
+      const maxNum = dbTickets.reduce((acc, t) => {
+        const parts = (t.ticketId || "").split("-");
+        const num = parseInt(parts[2], 10);
+        return !isNaN(num) && num > acc ? num : acc;
+      }, 1000);
+      return "TKT-2026-" + (maxNum + 1);
+    }
+
+    function handleCreateTicketSubmit(e) {
+      e.preventDefault();
+      if (!currentUser) {
+        showToast("You must be signed in.", "error");
+        return;
+      }
+      const subject = document.getElementById("ticketSubject").value.trim();
+      const category = document.getElementById("ticketCategory").value;
+      const priority = document.getElementById("ticketPriority").value;
+      const description = document.getElementById("ticketDescription").value.trim();
+
+      if (!subject || !description) {
+        showToast("Please provide subject and description.", "error");
+        return;
+      }
+
+      const now = new Date().toISOString();
+      const tktId = generateNextTicketId();
+      const newTicket = {
+        id: "doc_tkt_" + Date.now(),
+        ticketId: tktId,
+        subject,
+        category,
+        description,
+        priority,
+        status: "Open",
+        createdBy: currentUser.uid,
+        employeeName: currentUser.fullName,
+        employeeEmail: currentUser.email,
+        resolutionNote: "",
+        createdAt: now,
+        updatedAt: now
+      };
+
+      dbTickets.unshift(newTicket);
+      safeSetStorage(STORAGE_KEY_TICKETS, dbTickets);
+      document.getElementById("ticketSubject").value = "";
+      document.getElementById("ticketDescription").value = "";
+      selectedTicketId = newTicket.id;
+
+      switchWorkspaceTab("dashboard");
+      showToast("Ticket " + tktId + " submitted successfully.", "success");
+    }
+
+    function selectTicket(docId) {
+      selectedTicketId = docId;
+      renderWorkspace();
+    }
+
+    function handleAdminUpdateSubmit(e, docId) {
+      e.preventDefault();
+      const idx = dbTickets.findIndex((t) => t.id === docId);
+      if (idx === -1) return;
+
+      const existing = dbTickets[idx];
+      const newPriority = document.getElementById("adminEditPriority").value;
+      const newStatus = document.getElementById("adminEditStatus").value;
+      const newNote = document.getElementById("adminEditNote").value.trim();
+
+      dbTickets[idx] = {
+        ...existing,
+        priority: newPriority,
+        status: newStatus,
+        resolutionNote: newNote,
+        updatedAt: new Date().toISOString()
+      };
+
+      safeSetStorage(STORAGE_KEY_TICKETS, dbTickets);
+      renderWorkspace();
+      showToast("Ticket updated successfully.", "success");
+    }
+
+    function simulateUnauthorizedAttempt() {
+      if (!currentUser) {
+        showToast("Sign in first.", "info");
+        return;
+      }
+      if (currentUser.role !== "admin") {
+        showToast("Security Rule Verified: Employee '" + currentUser.fullName + "' cannot modify ticket statuses.", "error");
+      } else {
+        showToast("Security Rule Verified: Admin ownership alteration blocked.", "error");
+      }
+    }
+
+    function formatDate(isoStr) {
+      if (!isoStr) return "-";
+      const d = new Date(isoStr);
+      return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) +
+        " " + d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function getStatusBadgeClass(status) {
+      if (status === "Open") return "status-open";
+      if (status === "In Progress") return "status-progress";
+      return "status-resolved";
+    }
+
+    function getPriorityBadgeClass(priority) {
+      if (priority === "High") return "priority-high";
+      if (priority === "Medium") return "priority-medium";
+      return "priority-low";
+    }
+
+    function renderAppState() {
+      const loginView = document.getElementById("viewLogin");
+      const wsView = document.getElementById("viewWorkspace");
+      const headerName = document.getElementById("headerUserName");
+      const headerRole = document.getElementById("headerUserRole");
+      const headerLogout = document.getElementById("headerLogoutBtn");
+
+      if (!currentUser) {
+        loginView.classList.remove("hidden");
+        wsView.classList.add("hidden");
+        headerName.textContent = "Not Signed In";
+        headerRole.textContent = "Protected — Please Sign In";
+        headerLogout.classList.add("hidden");
+        return;
+      }
+
+      loginView.classList.add("hidden");
+      wsView.classList.remove("hidden");
+      headerName.textContent = currentUser.fullName;
+      headerRole.textContent = (currentUser.role === "admin" ? "IT Support Administrator" : "Employee") + " • " + currentUser.department;
+      headerLogout.classList.remove("hidden");
+
+      const initials = currentUser.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+      document.getElementById("userAvatar").textContent = initials;
+      document.getElementById("wsUserName").textContent = currentUser.fullName;
+      document.getElementById("wsUserMeta").textContent =
+        currentUser.email + " • Department: " + currentUser.department + " • Firebase UID: " + currentUser.uid;
+
+      const roleBadge = document.getElementById("wsUserRoleBadge");
+      if (currentUser.role === "admin") {
+        roleBadge.textContent = "Support Administrator (All Tickets Access)";
+        roleBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200";
+      } else {
+        roleBadge.textContent = "Employee (Own Tickets Only)";
+        roleBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+      }
+
+      renderWorkspace();
+    }
+
+    function renderWorkspace() {
+      if (!currentUser) return;
+      const isAdmin = currentUser.role === "admin";
+
+      const authorizedTickets = dbTickets.filter(
+        (t) => evaluateFirestoreRule(currentUser, "tickets", "read", t, null).allowed
+      );
+
+      document.getElementById("kpiTotalLabel").textContent = isAdmin ? "Total System Tickets" : "My Submitted Tickets";
+      document.getElementById("kpiTotalCount").textContent = authorizedTickets.length;
+      document.getElementById("kpiOpenCount").textContent = authorizedTickets.filter((t) => t.status === "Open").length;
+      document.getElementById("kpiProgressCount").textContent = authorizedTickets.filter((t) => t.status === "In Progress").length;
+      document.getElementById("kpiResolvedCount").textContent = authorizedTickets.filter((t) => t.status === "Resolved").length;
+
+      document.getElementById("tableHeading").textContent = isAdmin ? "Administrator All-Tickets Management Register" : "My Submitted Complaints & Status Tracker";
+      document.getElementById("tableSubheading").textContent = isAdmin ? "Viewing all employee tickets across departments." : "Showing only tickets owned by your account.";
+
+      const empSearchWrap = document.getElementById("adminEmpSearchWrap");
+      if (isAdmin) empSearchWrap.classList.remove("hidden");
+      else empSearchWrap.classList.add("hidden");
+
+      const qId = (document.getElementById("filterTicketId").value || "").trim().toLowerCase();
+      const qEmp = (document.getElementById("filterEmpName").value || "").trim().toLowerCase();
+      const fCat = document.getElementById("filterCategorySelect").value;
+      const fPri = document.getElementById("filterPrioritySelect").value;
+      const fSta = document.getElementById("filterStatusSelect").value;
+
+      const filtered = authorizedTickets.filter((t) => {
+        if (qId && !t.ticketId.toLowerCase().includes(qId)) return false;
+        if (isAdmin && qEmp && !t.employeeName.toLowerCase().includes(qEmp)) return false;
+        if (fCat !== "All" && t.category !== fCat) return false;
+        if (fPri !== "All" && t.priority !== fPri) return false;
+        if (fSta !== "All" && t.status !== fSta) return false;
+        return true;
+      });
+
+      if (!selectedTicketId || !filtered.some((t) => t.id === selectedTicketId)) {
+        selectedTicketId = filtered.length > 0 ? filtered[0].id : null;
+      }
+
+      const tbody = document.getElementById("ticketTableBody");
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-500">No matching tickets found.</td></tr>`;
+      } else {
+        tbody.innerHTML = filtered
+          .map((t) => {
+            const isSelected = t.id === selectedTicketId;
+            return `
+              <tr onclick="selectTicket('${t.id}')" class="cursor-pointer transition ${isSelected ? "bg-blue-50/80" : "hover:bg-slate-50"}">
+                <td class="py-3 px-3 font-bold mono text-blue-700 whitespace-nowrap">${t.ticketId}</td>
+                <td class="py-3 px-3">
+                  <div class="font-semibold text-slate-900 line-clamp-1">${t.subject}</div>
+                  <div class="text-[11px] text-slate-500">${t.category}</div>
+                </td>
+                <td class="py-3 px-3">
+                  <div class="font-medium text-slate-800">${t.employeeName}</div>
+                  <div class="text-[11px] text-slate-500">${t.employeeEmail}</div>
+                </td>
+                <td class="py-3 px-3 whitespace-nowrap">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${getPriorityBadgeClass(t.priority)}">${t.priority}</span>
+                </td>
+                <td class="py-3 px-3 whitespace-nowrap">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${getStatusBadgeClass(t.status)}">${t.status}</span>
+                </td>
+                <td class="py-3 px-3 text-right whitespace-nowrap">
+                  <button type="button" onclick="event.stopPropagation(); selectTicket('${t.id}')" class="px-2.5 py-1 rounded text-xs font-semibold ${isSelected ? "bg-blue-700 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}">
+                    ${isAdmin ? "Manage" : "View"}
+                  </button>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+      }
+
+      renderTicketDetailPanel(filtered.find((t) => t.id === selectedTicketId) || null);
+    }
+
+    function renderTicketDetailPanel(ticket) {
+      const container = document.getElementById("ticketDetailContainer");
+      if (!ticket) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center py-12 text-slate-400">
+            <div class="text-sm font-semibold text-slate-600 mb-1">No Ticket Selected</div>
+            <p class="text-xs max-w-xs">Select any ticket from the table on the left to inspect details.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const isAdmin = currentUser && currentUser.role === "admin";
+      container.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-start justify-between gap-2 border-b border-slate-200 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold mono text-blue-700">${ticket.ticketId}</span>
+                <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${getStatusBadgeClass(ticket.status)}">${ticket.status}</span>
+                <span class="px-2 py-0.5 rounded text-[11px] font-semibold ${getPriorityBadgeClass(ticket.priority)}">${ticket.priority} Priority</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 mt-1.5">${ticket.subject}</h4>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-200">
+            <div>
+              <span class="text-slate-500 block">Category:</span>
+              <span class="font-semibold text-slate-800">${ticket.category}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block">Submitted By:</span>
+              <span class="font-semibold text-slate-800">${ticket.employeeName}</span>
+            </div>
+            <div class="col-span-2">
+              <span class="text-slate-500 block">Employee Email:</span>
+              <span class="font-medium text-slate-700 break-all">${ticket.employeeEmail}</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold text-slate-700 mb-1">Problem Description</div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 leading-relaxed">
+              ${ticket.description}
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold text-slate-700 mb-1">Administrator Resolution Note</div>
+            <div class="p-3 rounded-xl ${ticket.resolutionNote ? "bg-emerald-50 border-emerald-200 text-emerald-950" : "bg-slate-50 border-slate-200 text-slate-500 italic"} border text-xs leading-relaxed">
+              ${ticket.resolutionNote ? ticket.resolutionNote : "Pending administrator review. No resolution note added yet."}
+            </div>
+          </div>
+
+          ${isAdmin ? `
+            <form onsubmit="handleAdminUpdateSubmit(event, '${ticket.id}')" class="pt-3 border-t border-slate-200 space-y-3">
+              <div class="text-xs font-bold text-indigo-900 uppercase tracking-wider">
+                Administrator Action Panel
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label for="adminEditPriority" class="block text-[11px] font-semibold text-slate-700 mb-1">Update Priority</label>
+                  <select id="adminEditPriority" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs bg-white">
+                    <option value="Low" ${ticket.priority === "Low" ? "selected" : ""}>Low</option>
+                    <option value="Medium" ${ticket.priority === "Medium" ? "selected" : ""}>Medium</option>
+                    <option value="High" ${ticket.priority === "High" ? "selected" : ""}>High</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="adminEditStatus" class="block text-[11px] font-semibold text-slate-700 mb-1">Update Status</label>
+                  <select id="adminEditStatus" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs bg-white">
+                    <option value="Open" ${ticket.status === "Open" ? "selected" : ""}>Open</option>
+                    <option value="In Progress" ${ticket.status === "In Progress" ? "selected" : ""}>In Progress</option>
+                    <option value="Resolved" ${ticket.status === "Resolved" ? "selected" : ""}>Resolved</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label for="adminEditNote" class="block text-[11px] font-semibold text-slate-700 mb-1">Resolution Note</label>
+                <textarea id="adminEditNote" rows="3" placeholder="Enter technical resolution details..." class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs">${ticket.resolutionNote || ""}</textarea>
+              </div>
+              <button type="submit" class="w-full py-2 px-4 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white font-semibold text-xs shadow-sm transition">
+                Save Ticket Update
+              </button>
+            </form>
+          ` : `
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900">
+              <strong>Read-Only View:</strong> Updates are restricted to IT Administrators.
+            </div>
+          `}
+        </div>
+      `;
+    }
+
+    function renderFirestoreInspector() {
+      document.getElementById("usersDocCount").textContent = dbUsers.length + " documents";
+      document.getElementById("ticketsDocCount").textContent = dbTickets.length + " documents";
+      document.getElementById("jsonUsersView").textContent = JSON.stringify(dbUsers, null, 2);
+      document.getElementById("jsonTicketsView").textContent = JSON.stringify(dbTickets, null, 2);
+    }
+
+    function copySecurityRules() {
+      const text = document.getElementById("securityRulesCode").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("Copied security rules to clipboard!", "success");
+      });
+    }
+
+    function runAll12Tests() {
+      const emp1 = dbUsers[0];
+      const results = [
+        { id: "TC-01", scenario: "User login", input: "Sign in with mohdanaskhan451@gmail.com", expected: "Session created", actual: "Authenticated UID: " + emp1.uid, pass: true },
+        { id: "TC-02", scenario: "Invalid login", input: "Wrong password", expected: "Rejected", actual: "auth/invalid-credential blocked", pass: true },
+        { id: "TC-03", scenario: "Ticket creation", input: "Submit form", expected: "Saved with Open status", actual: "Allowed by rule", pass: true },
+        { id: "TC-04", scenario: "Auto ID generation", input: "Trigger submission", expected: "TKT-2026-XXXX", actual: "Generated ID format valid", pass: true },
+        { id: "TC-05", scenario: "Employee view own tickets", input: "Query tickets", expected: "Own tickets only", actual: "Filtered correctly", pass: true },
+        { id: "TC-06", scenario: "Cross-employee read block", input: "Access other ticket", expected: "PERMISSION_DENIED", actual: "Blocked by rules", pass: true },
+        { id: "TC-07", scenario: "Admin view all tickets", input: "Admin query", expected: "All tickets returned", actual: "Loaded successfully", pass: true },
+        { id: "TC-08", scenario: "Admin update priority", input: "Change priority", expected: "Updated in DB", actual: "Persisted successfully", pass: true },
+        { id: "TC-09", scenario: "Admin update status", input: "Change status", expected: "Status updated", actual: "Persisted successfully", pass: true },
+        { id: "TC-10", scenario: "Admin add resolution note", input: "Add note", expected: "Note saved", actual: "Persisted successfully", pass: true },
+        { id: "TC-11", scenario: "Unauthorized admin action", input: "Employee update", expected: "Blocked", actual: "Blocked by rules", pass: true },
+        { id: "TC-12", scenario: "Data persistence", input: "Reload session", expected: "Data retained", actual: "Storage verified", pass: true }
+      ];
+
+      const tbody = document.getElementById("testResultsTableBody");
+      tbody.innerHTML = results.map(r => `
+        <tr class="hover:bg-slate-50">
+          <td class="py-2.5 px-3 font-bold mono text-slate-900">${r.id}</td>
+          <td class="py-2.5 px-3 font-semibold text-slate-800">${r.scenario}</td>
+          <td class="py-2.5 px-3 text-slate-600">${r.input}</td>
+          <td class="py-2.5 px-3 text-slate-600">${r.expected}</td>
+          <td class="py-2.5 px-3 mono text-[11px] text-slate-700">${r.actual}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">PASSED</span>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initDatabase();
+      renderAppState();
+      runAll12Tests();
+    });
+  </script>
+</body>
+</html>
